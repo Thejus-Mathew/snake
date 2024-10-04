@@ -1,0 +1,41 @@
+.square{
+  width: 40%;
+  min-width: 350px;
+  aspect-ratio: 1/1;
+}
+.control{
+  width: 17%;
+  min-width: 150px;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  overflow: hidden;
+  transform: rotate(45deg);
+}
+.circle{
+  width: 30%;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+}
+.main{
+  background-image: url('./assets/background.jpg');
+  background-size: cover;
+}
+.snakeBody{
+  width: 85%;
+  height: 85%;
+  background-color: black;
+  border-radius: 45%;
+}
+.control button{
+  background-color: rgba(0, 0, 0, 0);
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+
+@media screen and (max-width:600px) {
+  .main{
+    flex-direction: column;
+  }
+}
