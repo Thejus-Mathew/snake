@@ -5,6 +5,7 @@ import headImg2 from './assets/snakeHead2.png'
 import headImg3 from './assets/snakeHead3.png'
 import headImg4 from './assets/snakeHead4.png'
 import blood from './assets/blood.png'
+import frog from './assets/frog.png'
 
 function App() {
 
@@ -19,13 +20,19 @@ function App() {
 
   let dummySquare = []
   for(let i=1;i<=(width*width);i++){
-    dummySquare.push({snakeHead:false,food:false,snakeBody:false,border:false,index:(i-1)})
+    dummySquare.push({snakeHead:false,snakeBody:false,border:false,index:(i-1),frog:false})
   }
   dummySquare = dummySquare.map((item,index)=>(
     border.includes(index)?{...item,border:true}:{...item}
   ))
   dummySquare[435]={...dummySquare[435],snakeHead:true}
-
+  dummySquare[434]={...dummySquare[434],snakeBody:true}
+  dummySquare[433]={...dummySquare[433],snakeBody:true}
+  dummySquare[432]={...dummySquare[432],snakeBody:true}
+  let dummySquare1 = dummySquare.filter(item=>!item.snakeHead && !item.border && !item.snakeBody)
+  let key = dummySquare1[Math.floor(Math.random()*dummySquare1.length)].index
+  dummySquare[key] = {...dummySquare[key],frog:true}
+  const[body,setBody] = useState([434,433,432])
   const[square,setSquare]=useState(dummySquare)
   const[dir,setDir]=useState(1)
   const [intervalId, setIntervalId] = useState(null);
@@ -34,6 +41,7 @@ function App() {
 
 
   const startInterval = (dire) => {
+    console.log(body);
     if (!intervalId) {
       const id = setInterval(() => {
         setDead(false)
@@ -46,13 +54,28 @@ function App() {
                     dire==-1?index-1:
                     dire==2?index-width:
                     dire==-2?index+width:null
-    
           newData[index]={...newData[index],snakeHead:false}
           newData[newIndex]={...newData[newIndex],snakeHead:true}
+          for(let i =(body.length-1);i>-1;i--){
+            console.log(i,"i");
+            
+            if(i==0){
+              body[i]=index
+              console.log(index);
+            }else{
+              body[i]=body[i-1]
+            }
+          }
+          newData = newData.map(item=>({...item,snakeBody:false}))
+          for(let i = 0;i<body.length;i++){
+            newData[body[i]]= {...newData[body[i]],snakeBody:true}
+          }
           return newData
       })
+      console.log(body);
+      
 
-      }, 400);
+      }, 300);
       setIntervalId(id);
     }
   };
@@ -96,6 +119,7 @@ const changeDir=(i)=>{
                 {item.snakeHead?<img src={dir==1?headImg:dir==-1?headImg2:dir==2?headImg3:headImg4} width={"100%"} height={"100%"} alt="" />:<></>}
                 {item.snakeBody?<div className='snakeBody'></div>:<></>}
                 {dead && item.snakeHead?<img className='position-absolute' src={blood} width={"100%"} height={"100%"}/>:<></>}
+                {item.frog?<img src={frog} width={"100%"} height={"100%"}/>:<></>}
               </div>
             ))
           }
