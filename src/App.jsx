@@ -37,11 +37,11 @@ function App() {
   const[dir,setDir]=useState(1)
   const [intervalId, setIntervalId] = useState(null);
   const[dead,setDead]=useState(false)
+  const[score,setScore]=useState(0)
 
 
 
   const startInterval = (dire) => {
-    console.log(body);
     if (!intervalId) {
       const id = setInterval(() => {
         setDead(false)
@@ -56,15 +56,24 @@ function App() {
                     dire==-2?index+width:null
           newData[index]={...newData[index],snakeHead:false}
           newData[newIndex]={...newData[newIndex],snakeHead:true}
+          let frogkey = newData.find(item=>item.frog).index
+          let headKey = newData.find(item=>item.snakeHead).index
+          let key
+          if(frogkey==headKey) {
+            key = body[body.length-1]
+          }
+
           for(let i =(body.length-1);i>-1;i--){
-            console.log(i,"i");
             
             if(i==0){
               body[i]=index
-              console.log(index);
             }else{
               body[i]=body[i-1]
             }
+          }
+
+          if(frogkey==headKey) {
+            body.push(key)
           }
           newData = newData.map(item=>({...item,snakeBody:false}))
           for(let i = 0;i<body.length;i++){
@@ -72,7 +81,6 @@ function App() {
           }
           return newData
       })
-      console.log(body);
       
 
       }, 300);
@@ -92,26 +100,59 @@ useEffect(()=>{
 },[dir])
 
 useEffect(()=>{
-  let square2 = square.filter(item=>item.border)
+  let square2 = square.filter(item=>item.border || item.snakeBody)
   if(square2.find(item=>item.snakeHead)){
     stopInterval()
     setDead(true)
   }
+  let frogkey = square.find(item=>item.frog).index
+  let headKey = square.find(item=>item.snakeHead).index
+  if(frogkey==headKey) {
+    setScore((previousData)=>{
+      let newData = previousData+1
+      return newData
+    })
+    setSquare((previousData)=>{
+      let newData = [...previousData]
+      newData[frogkey] = {...newData[frogkey],frog:false}
+      let dummyNewData = newData.filter(item=>!item.snakeHead && !item.border && !item.snakeBody)
+      let key = dummyNewData[Math.floor(Math.random()*dummySquare1.length)].index
+      newData[key] = {...newData[key],frog:true}
+      return newData
+    })
+  }
+
 },[square])
 
 
 const changeDir=(i)=>{
-  if((dir != i) && (dir + i != 0)){
-    stopInterval()
-    setDir(i)
+  if(!dead){
+    if((dir != i) && (dir + i != 0)){
+      stopInterval()
+      setDir(i)
+    }
   }
 }
 
+const restart = ()=>{
+    setSquare(dummySquare)
+    setDir(1)
+    setBody([434,433,432])
+    setDead(false)
+    setScore(0)
+    startInterval(1)
+}
 
   
   return (
     <>
-      <div className="main d-flex justify-content-center align-items-center gap-5" style={{width:"100%",height:"100vh"}}>
+      <div className="main d-flex justify-content-center align-items-center gap-5 position-relative" style={{width:"100%",height:"100vh"}}>
+        {
+          dead?<div className='restart position-absolute text-center text-light p-3 rounded shadow-lg'>
+                  <h2>Your Score: {score}</h2>
+                  <button className='btn btn-light' onClick={restart}>restart</button>
+              </div>:<></>
+        }
         <div className="square bg-dark d-flex flex-wrap">
           {
             square.map((item,index)=>(

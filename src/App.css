@@ -32,6 +32,12 @@
   height: 100%;
   border: none;
 }
+.restart{
+  z-index: 5;
+  width: 300px;
+  backdrop-filter: blur(5px);
+  background-color: rgba(0, 0, 0, 0.212);
+}
 
 
 @media screen and (max-width:600px) {
