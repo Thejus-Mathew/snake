@@ -99,7 +99,8 @@ function App() {
 
 useEffect(()=>{
   startInterval(dir)
-},[dir])
+}
+,[dir])
 
 useEffect(()=>{
   let square2 = square.filter(item=>item.border || item.snakeBody)
@@ -130,7 +131,8 @@ useEffect(()=>{
     inputRef.current.focus();
   }
 
-},[square])
+}
+,[square])
 
 
 const changeDir=(i)=>{
