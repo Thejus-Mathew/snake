@@ -116,7 +116,7 @@ useEffect(()=>{
       return newData
     })
     if(time != 50){
-      setTime((data)=>(data-25))
+      setTime((data)=>(data-12.5))
     }
     setSquare((previousData)=>{
       let newData = [...previousData]

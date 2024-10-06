@@ -19,6 +19,7 @@
 .main{
   background-image: url('./assets/background.jpg');
   background-size: cover;
+  background-position: center;
 }
 .snakeBody{
   width: 85%;
