@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
 import headImg from './assets/snakeHead.png'
 import headImg2 from './assets/snakeHead2.png'
@@ -38,13 +38,14 @@ function App() {
   const [intervalId, setIntervalId] = useState(null);
   const[dead,setDead]=useState(false)
   const[score,setScore]=useState(0)
+  const inputRef = useRef(null);
+  const[hs,setHS]=useState(0)
 
 
 
   const startInterval = (dire) => {
     if (!intervalId) {
       const id = setInterval(() => {
-        setDead(false)
         setSquare((previousData)=>{
           let index = previousData.find(item=>item.snakeHead).index
           let newData = [...previousData]
@@ -121,6 +122,9 @@ useEffect(()=>{
       return newData
     })
   }
+  if(deviceType=='desktop'){
+    inputRef.current.focus();
+  }
 
 },[square])
 
@@ -141,12 +145,49 @@ const restart = ()=>{
     setDead(false)
     setScore(0)
     startInterval(1)
+    if(score>hs){
+      setHS(score)
+      localStorage.setItem("hs",score)
+    }
 }
 
+const handleKeyDown = (event) => {
+  if (event.key === 'ArrowUp'|| event.key === 'w') {
+    changeDir(2)
+  }else if(event.key === 'ArrowDown' || event.key === 's'){
+    changeDir(-2)
+  }
+  else if(event.key === 'ArrowLeft'|| event.key === 'a'){
+    changeDir(-1)
+  }
+  else if(event.key === 'ArrowRight'|| event.key === 'd'){
+    changeDir(1)
+  }
+}
+
+
+
+const [deviceType, setDeviceType] = useState('tablet');
+
+const getDeviceType = () => {
+  const screenWidth = window.innerWidth;
+  if (screenWidth <= 1024) {
+    setDeviceType('tablet');
+  } else {
+    setDeviceType('desktop');
+  }
+};
+useEffect(()=>{
+  getDeviceType()
+  if(localStorage.getItem('hs')){
+    setHS(localStorage.getItem("hs"))
+  }
+},[])
   
   return (
     <>
       <div className="main d-flex justify-content-center align-items-center gap-5 position-relative" style={{width:"100%",height:"100vh"}}>
+        <input style={{opacity:"0",width:'0',height:"0",position:"absolute"}} type="text" onKeyDown={handleKeyDown} ref={inputRef}/>
         {
           dead?<div className='restart position-absolute text-center text-light p-3 rounded shadow-lg'>
                   <h2>Your Score: {score}</h2>
@@ -156,16 +197,29 @@ const restart = ()=>{
         <div className="square bg-dark d-flex flex-wrap">
           {
             square.map((item,index)=>(
-              <div key={index} className={`cell d-flex justify-content-center align-items-center position-relative ${(item.border)?"bg-secondary":"bg-success"}`} style={{width:`${100/width}%`,height:`${100/width}%`}}>
+              <div key={index} className={`cell text-light d-flex justify-content-center align-items-center position-relative ${(item.border)?"bg-secondary":"bg-success"}`} style={{width:`${100/width}%`,height:`${100/width}%`}}>
                 {item.snakeHead?<img src={dir==1?headImg:dir==-1?headImg2:dir==2?headImg3:headImg4} width={"100%"} height={"100%"} alt="" />:<></>}
                 {item.snakeBody?<div className='snakeBody'></div>:<></>}
                 {dead && item.snakeHead?<img className='position-absolute' src={blood} width={"100%"} height={"100%"}/>:<></>}
                 {item.frog?<img src={frog} width={"100%"} height={"100%"}/>:<></>}
+                {(item?.index==width-2)?<div className='position-absolute'>{score}</div>:<></>}
+                {(item?.index==width-3)?<div className='position-absolute'>:</div>:<></>}
+                {(item?.index==width-4)?<div className='position-absolute'>E</div>:<></>}
+                {(item?.index==width-5)?<div className='position-absolute'>R</div>:<></>}
+                {(item?.index==width-6)?<div className='position-absolute'>O</div>:<></>}
+                {(item?.index==width-7)?<div className='position-absolute'>C</div>:<></>}
+                {(item?.index==width-8)?<div className='position-absolute'>S</div>:<></>}
+                {(item?.index==1)?<div className='position-absolute'>H</div>:<></>}
+                {(item?.index==2)?<div className='position-absolute'>S</div>:<></>}
+                {(item?.index==3)?<div className='position-absolute'>:</div>:<></>}
+                {(item?.index==4)?<div className='position-absolute'>{hs}</div>:<></>}
               </div>
             ))
           }
         </div>
-        <div className="control bg-secondary d-flex flex-wrap border border-3 position-relative justify-content-center align-items-center">
+        {
+          deviceType=='tablet'?
+          <div className="control bg-secondary d-flex flex-wrap border border-3 position-relative justify-content-center align-items-center">
           <div className="button w-50 border border-3 d-flex justify-content-center align-items-center" style={{aspectRatio:"1/1"}}>
             <button onClick={()=>changeDir(2)}><i className="fa-solid fa-caret-right fa-rotate-by fa-xl" style={{ "--fa-rotate-angle": "-135deg" }}></i></button>
           </div>
@@ -179,7 +233,8 @@ const restart = ()=>{
             <button onClick={()=>changeDir(-2)}><i className="fa-solid fa-caret-right fa-rotate-by fa-xl" style={{ "--fa-rotate-angle": "45deg" }}></i></button>
           </div>
           <div className="circle position-absolute text-info bg-light"></div>
-        </div>
+        </div>:<></>
+        }
       </div>
     </>
   )
