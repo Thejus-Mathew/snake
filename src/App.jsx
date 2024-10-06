@@ -10,7 +10,7 @@ import frog from './assets/frog.png'
 function App() {
 
   const width = 30
-  const border = []
+  let border = []
   for(let i =0;i<width;i++){
     border.push(i)
     border.push((width*(width-1))+i)
@@ -40,6 +40,7 @@ function App() {
   const[score,setScore]=useState(0)
   const inputRef = useRef(null);
   const[hs,setHS]=useState(0)
+  const[time,setTime]=useState(200)
 
 
 
@@ -84,7 +85,7 @@ function App() {
       })
       
 
-      }, 300);
+      }, time);
       setIntervalId(id);
     }
   };
@@ -113,6 +114,9 @@ useEffect(()=>{
       let newData = previousData+1
       return newData
     })
+    if(time != 50){
+      setTime((data)=>(data-25))
+    }
     setSquare((previousData)=>{
       let newData = [...previousData]
       newData[frogkey] = {...newData[frogkey],frog:false}
@@ -139,7 +143,32 @@ const changeDir=(i)=>{
 }
 
 const restart = ()=>{
-    setSquare(dummySquare)
+    setSquare(()=>{
+      let border = []
+  for(let i =0;i<width;i++){
+    border.push(i)
+    border.push((width*(width-1))+i)
+    border.push((i*width))
+    border.push((i*width)+(width-1))
+  }
+
+  let dummySquare = []
+  for(let i=1;i<=(width*width);i++){
+    dummySquare.push({snakeHead:false,snakeBody:false,border:false,index:(i-1),frog:false})
+  }
+  dummySquare = dummySquare.map((item,index)=>(
+    border.includes(index)?{...item,border:true}:{...item}
+  ))
+  dummySquare[435]={...dummySquare[435],snakeHead:true}
+  dummySquare[434]={...dummySquare[434],snakeBody:true}
+  dummySquare[433]={...dummySquare[433],snakeBody:true}
+  dummySquare[432]={...dummySquare[432],snakeBody:true}
+  let dummySquare1 = dummySquare.filter(item=>!item.snakeHead && !item.border && !item.snakeBody)
+  let key = dummySquare1[Math.floor(Math.random()*dummySquare1.length)].index
+  dummySquare[key] = {...dummySquare[key],frog:true}
+  return dummySquare
+    })
+    setTime(200)
     setDir(1)
     setBody([434,433,432])
     setDead(false)
